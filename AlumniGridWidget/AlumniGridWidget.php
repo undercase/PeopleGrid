@@ -8,10 +8,6 @@ Version: 0.1
 Author URI: http://thomashobohm.com/
 */
 
-function empty_filter($text) {
-  return $text != '';
-}
-
 class AlumniGridWidget extends WP_Widget {
   // class constructor
   public function __construct() {
@@ -28,33 +24,87 @@ class AlumniGridWidget extends WP_Widget {
 
   // output the option form field in admin Widgets screen
   public function form($instance) {
-    $alumni = empty($instance['alumni']) ? array() : $instance['alumni'];
-    $alumnilength = count($alumni);
+    $alumni_names = empty($instance['alumni_names']) ? array() : $instance['alumni_names'];
+    $alumni_image_links = empty($instance['alumni_image_links']) ? array() : $instance['alumni_image_links'];
+    $alumni_positions = empty($instance['alumni_positions']) ? array() : $instance['alumni_positions'];
+    $alumni_length = count($alumni_names);
     ?>
-    <ul>
-    <?php foreach ($alumni as $alumindex=>$alum) { ?>
-      <li>
-        <input
-          type="text"
-          name="<?php echo esc_attr($this->get_field_name('alumni')); ?>[<?php echo $alumindex; ?>]"
-          value="<?php echo $alum; ?>">
-      </li>
-    <?php } ?>
-    <li>
-      <input
-        type="text"
-        name="<?php echo esc_attr($this->get_field_name('alumni')); ?>[<?php echo $alumnilength; ?>]"
-        value="">
-    </li>
-    </ul>
+    <div class="alumni">
+      <?php for($alumni_index=0; $alumni_index<$alumni_length; $alumni_index++) { ?>
+        <div class="alum">
+          <h2><?php echo $alumni_names[$alumni_index]; ?></h2>
+          <div class="name">
+            <label for="<?php echo esc_attr($this->get_field_id('alumni_names')); ?>[<?php echo $alumni_index; ?>]">Name</label>
+            <input
+              type="text"
+              name="<?php echo esc_attr($this->get_field_name('alumni_names')); ?>[<?php echo $alumni_index; ?>]"
+              value="<?php echo $alumni_names[$alumni_index]; ?>">
+          </div>
+          <div class="position">
+            <label for="<?php echo esc_attr($this->get_field_id('alumni_positions')); ?>[<?php echo $alumni_index; ?>]">Position</label>
+            <input
+              type="text"
+              name="<?php echo esc_attr($this->get_field_name('alumni_positions')); ?>[<?php echo $alumni_index; ?>]"
+              value="<?php echo $alumni_positions[$alumni_index]; ?>">
+          </div>
+          <div class="image">
+            <label for="<?php echo esc_attr($this->get_field_id('alumni_image_links')); ?>[<?php echo $alumni_index; ?>]">Image Link</label>
+            <input
+              type="text"
+              name="<?php echo esc_attr($this->get_field_name('alumni_image_links')); ?>[<?php echo $alumni_index; ?>]"
+              value="<?php echo $alumni_image_links[$alumni_index]; ?>">
+          </div>
+        </div>
+      <?php } ?>
+      <div class="alum">
+        <h2>New Alumni</h2>
+        <div class="name">
+          <label for="<?php echo esc_attr($this->get_field_id('alumni_names')); ?>[<?php echo $alumni_length; ?>]">Name</label>
+          <input
+            type="text"
+            name="<?php echo esc_attr($this->get_field_name('alumni_names')); ?>[<?php echo $alumni_length; ?>]"
+            value="">
+        </div>
+        <div class="position">
+          <label for="<?php echo esc_attr($this->get_field_id('alumni_positions')); ?>[<?php echo $alumni_length; ?>]">Position</label>
+          <input
+            type="text"
+            name="<?php echo esc_attr($this->get_field_name('alumni_positions')); ?>[<?php echo $alumni_length; ?>]"
+            value="">
+        </div>
+        <div class="image">
+          <label for="<?php echo esc_attr($this->get_field_id('alumni_image_links')); ?>[<?php echo $alumni_length; ?>]">Image Link</label>
+          <input
+            type="text"
+            name="<?php echo esc_attr($this->get_field_name('alumni_image_links')); ?>[<?php echo $alumni_length; ?>]"
+            value="">
+        </div>
+      </div>
+    </div>
     <?php
   }
 
   // save options
   public function update($new_instance, $old_instance) {
     $instance = array();
-    $alumni = empty($new_instance['alumni']) ? array() : (array) $new_instance['alumni'];
-    $instance['alumni'] = array_filter(array_map('sanitize_text_field', $alumni), 'empty_filter');
+    $alumni_names = empty($new_instance['alumni_names']) ? array() : (array) $new_instance['alumni_names'];
+    $alumni_positions = empty($new_instance['alumni_positions']) ? array() : (array) $new_instance['alumni_positions'];
+    $alumni_image_links = empty($new_instance['alumni_image_links']) ? array() : (array) $new_instance['alumni_image_links'];
+    $alumnis_to_remove = array();
+    foreach ($alumni_names as $alumni_index=>$alumni_name) {
+      if ($alumni_name == '') {
+        array_push($alumnis_to_remove, $alumni_index);
+      }
+    }
+    $instance['alumni_names'] = array_filter($alumni_names, function($key) use ($alumnis_to_remove) {
+      return !in_array($key, $alumnis_to_remove);
+    }, ARRAY_FILTER_USE_KEY);;
+    $instance['alumni_positions'] = array_filter($alumni_positions, function($key) use ($alumnis_to_remove) {
+      return !in_array($key, $alumnis_to_remove);
+    }, ARRAY_FILTER_USE_KEY);
+    $instance['alumni_image_links'] = array_filter($alumni_image_links, function($key) use ($alumnis_to_remove) {
+      return !in_array($key, $alumnis_to_remove);
+    }, ARRAY_FILTER_USE_KEY);
 
     return $instance;
   }
