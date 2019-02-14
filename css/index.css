@@ -19,6 +19,12 @@ body {
   justify-content: stretch;
 }
 
+@media screen and (max-width: 600px) {
+  .grid {
+    flex-direction: column;
+  }
+}
+
 .grid .col {
   flex: 1;
   background: #000;
