@@ -4,7 +4,7 @@ Plugin Name: Alumni Grid
 Plugin URI: http://wordpress.org/extend/plugins/#
 Description: This is a plugin to create a grid of alumni profiles.
 Author: Thomas Hobohm
-Version: 0.1
+Version: 1.0
 Author URI: http://thomashobohm.com/
 */
 
