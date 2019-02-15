@@ -15,4 +15,4 @@ In `AlumniGridWidget` there is a fully self-contained WordPress widget implement
 
 2. Add the widget, `AlumniGridWidget`, to part of your WordPress website from the `Appearance->Widgets` page. Use the widget options to add, edit, or remove alumni from the grid:
 
-![Screenshot of widget options](screenshots/widget options.PNG)
+![Screenshot of widget options](screenshots/widget%20options.PNG)
