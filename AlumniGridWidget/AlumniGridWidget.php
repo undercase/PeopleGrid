@@ -27,10 +27,10 @@ class AlumniGridWidget extends WP_Widget {
     $alumni_names = empty($instance['alumni_names']) ? array() : $instance['alumni_names'];
     $alumni_image_links = empty($instance['alumni_image_links']) ? array() : $instance['alumni_image_links'];
     $alumni_positions = empty($instance['alumni_positions']) ? array() : $instance['alumni_positions'];
-    $alumni_length = count($alumni_names);
+    $alumni_length = max(array_keys($alumni_names))+1;
     ?>
     <div class="alumni">
-      <?php for($alumni_index=0; $alumni_index<$alumni_length; $alumni_index++) { ?>
+      <?php foreach($alumni_names as $alumni_index=>$alumni_value) { ?>
         <div class="alum">
           <h2><?php echo $alumni_names[$alumni_index]; ?></h2>
           <div class="name">
@@ -53,6 +53,13 @@ class AlumniGridWidget extends WP_Widget {
               type="text"
               name="<?php echo esc_attr($this->get_field_name('alumni_image_links')); ?>[<?php echo $alumni_index; ?>]"
               value="<?php echo $alumni_image_links[$alumni_index]; ?>">
+          </div>
+          <div class="delete">
+            <label for="<?php echo esc_attr($this->get_field_id('delete_alumni')); ?>[<?php echo $alumni_index; ?>]">Delete?</label>
+            <input
+              type="checkbox"
+              name="<?php echo esc_attr($this->get_field_name('delete_alumni')); ?>[<?php echo $alumni_index; ?>]"
+              value="<?php echo $alumni_index; ?>" />
           </div>
         </div>
       <?php } ?>
@@ -90,15 +97,21 @@ class AlumniGridWidget extends WP_Widget {
     $alumni_names = empty($new_instance['alumni_names']) ? array() : (array) $new_instance['alumni_names'];
     $alumni_positions = empty($new_instance['alumni_positions']) ? array() : (array) $new_instance['alumni_positions'];
     $alumni_image_links = empty($new_instance['alumni_image_links']) ? array() : (array) $new_instance['alumni_image_links'];
+    $delete_alumni = empty($new_instance['delete_alumni']) ? array() : (array) $new_instance['delete_alumni'];
     $alumnis_to_remove = array();
+    foreach ($delete_alumni as $alumni_index) {
+      array_push($alumnis_to_remove, (int)$alumni_index);
+    }
     foreach ($alumni_names as $alumni_index=>$alumni_name) {
       if ($alumni_name == '') {
-        array_push($alumnis_to_remove, $alumni_index);
+        if (!in_array($alumni_index, $alumnis_to_remove)) {
+          array_push($alumnis_to_remove, $alumni_index);
+        }
       }
     }
     $instance['alumni_names'] = array_filter($alumni_names, function($key) use ($alumnis_to_remove) {
       return !in_array($key, $alumnis_to_remove);
-    }, ARRAY_FILTER_USE_KEY);;
+    }, ARRAY_FILTER_USE_KEY);
     $instance['alumni_positions'] = array_filter($alumni_positions, function($key) use ($alumnis_to_remove) {
       return !in_array($key, $alumnis_to_remove);
     }, ARRAY_FILTER_USE_KEY);
