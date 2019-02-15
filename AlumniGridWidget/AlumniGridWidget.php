@@ -20,7 +20,55 @@ class AlumniGridWidget extends WP_Widget {
   }
 
   // output the widget content on the frontend
-  public function widget($args, $instance) {}
+  public function widget($args, $instance) {
+    wp_enqueue_style('myprefix-style', plugins_url('index.css', __FILE__));
+
+    // Split up alumni into three odbc_columns
+    $columns = array(
+      array(),
+      array(),
+      array()
+    );
+
+    $alumni_count = 0;
+    $number_of_columns = 3;
+    foreach($instance['alumni_names'] as $key=>$alum) {
+      array_push($columns[$alumni_count % $number_of_columns], $key);
+      $alumni_count++;
+    }
+    ?>
+    <div class="wrapper">
+      <div class="grid">
+        <?php
+        // Build each column
+        for($column=0; $column<$number_of_columns; $column++) {
+          ?>
+            <div class="col">
+              <?php
+              // Build each alumni
+              foreach($columns[$column] as $alumni_index) {
+                $alumni_name = $instance['alumni_names'][$alumni_index];
+                $alumni_position = $instance['alumni_positions'][$alumni_index];
+                $alumni_image_link = $instance['alumni_image_links'][$alumni_index];
+                ?>
+                  <div class="person">
+                    <img src="<?php echo $alumni_image_link; ?>" alt="<?php echo $alumni_name; ?>">
+                    <div class="info">
+                      <h3><?php echo $alumni_name ?></h3>
+                      <h3 class="subtitle"><?php echo $alumni_position ?></h3>
+                    </div>
+                  </div>
+                <?php
+              }
+              ?>
+            </div>
+          <?php
+        }
+        ?>
+      </div>
+    </div>
+    <?php
+  }
 
   // output the option form field in admin Widgets screen
   public function form($instance) {
