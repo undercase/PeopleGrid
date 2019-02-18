@@ -55,6 +55,9 @@ function alumni_grid_add_local_field_groups() {
 
 // [alumni_grid]
 function alumni_grid_shortcode() {
+  // Start output buffer
+  ob_start();
+
   $args = array(
     'post_type' => 'alumni',
     'post_status' => 'publish',
@@ -113,6 +116,11 @@ function alumni_grid_shortcode() {
     </div>
   </div>
   <?php
+
+  $output = ob_get_contents();
+  ob_end_clean();
+
+  return $output;
 }
 
 add_shortcode('alumni_grid', 'alumni_grid_shortcode');
