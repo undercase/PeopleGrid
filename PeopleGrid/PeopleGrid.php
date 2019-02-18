@@ -74,12 +74,14 @@ function people_grid_shortcode() {
       $name = get_the_title();
       $position = get_field('position');
       $thumbnail = wp_get_attachment_image_src(get_post_thumbnail_id(), 'full');
+      $person_link = get_the_permalink();
       $profile_image = $thumbnail[0];
       // Output
       array_push($columns[$people_count % $number_of_columns], array(
         'name' => $name,
         'position' => $position,
-        'image' => $profile_image
+        'image' => $profile_image,
+        'link' => $person_link
       ));
       $people_count++;
     }
@@ -98,7 +100,9 @@ function people_grid_shortcode() {
               $people_name = $people['name'];
               $people_position = $people['position'];
               $people_image_link = $people['image'];
+              $people_link = $people['link'];
               ?>
+                <a href="<?php echo $people_link; ?>">
                 <div class="person">
                   <img src="<?php echo $people_image_link; ?>" alt="<?php echo $people_name; ?>">
                   <div class="info">
@@ -106,6 +110,7 @@ function people_grid_shortcode() {
                     <h3 class="subtitle"><?php echo $people_position ?></h3>
                   </div>
                 </div>
+                </a>
               <?php
             }
             ?>
