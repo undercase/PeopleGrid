@@ -1,41 +1,41 @@
 <?php
 /*
-Plugin Name: Alumni Grid Custom Post Type
+Plugin Name: People Grid
 Plugin URI: http://wordpress.org/extend/plugins/#
-Description: This is a plugin to create a custom post type to build a grid of alumni profiles.
+Description: This is a plugin to create a custom post type to build a grid of people.
 Author: Thomas Hobohm
-Version: 0.1
+Version: 1.0
 Author URI: http://thomashobohm.com/
 */
 
 // register custom post type on init
 add_action('init', 'register_custom_posts_init');
-add_action('acf/init', 'alumni_grid_add_local_field_groups');
+add_action('acf/init', 'people_grid_add_local_field_groups');
 
 function register_custom_posts_init() {
-  $alumni_labels = array(
-    'name' => 'Alumni',
-    'singular_name' => 'Alum',
-    'menu_name' => 'Alumni'
+  $people_labels = array(
+    'name' => 'People',
+    'singular_name' => 'Person',
+    'menu_name' => 'People'
   );
-  $alumni_args = array(
-    'labels' => $alumni_labels,
-    'description' => 'An alumni profile box',
+  $people_args = array(
+    'labels' => $people_labels,
+    'description' => 'An profile box',
     'public' => true,
     'capability_type' => 'post',
     'has_archive' => true,
     'supports' => array('title', 'thumbnail')
   );
-  register_post_type('alumni', $alumni_args);
+  register_post_type('people', $people_args);
 }
 
-function alumni_grid_add_local_field_groups() {
+function people_grid_add_local_field_groups() {
   acf_add_local_field_group(array(
-    'key' => 'alumni_1',
-    'title' => 'Alumni Info',
+    'key' => 'people_1',
+    'title' => 'People Info',
     'fields' => array(
       array(
-        'key' => 'alumni_field_1',
+        'key' => 'people_field_1',
         'label' => 'Position',
         'name' => 'position',
         'type' => 'text'
@@ -46,42 +46,42 @@ function alumni_grid_add_local_field_groups() {
         array(
           'param' => 'post_type',
           'operator' => '==',
-          'value' => 'alumni'
+          'value' => 'people'
         )
       )
     )
   ));
 }
 
-// [alumni_grid]
-function alumni_grid_shortcode() {
+// [people_grid]
+function people_grid_shortcode() {
   // Start output buffer
   ob_start();
 
   $args = array(
-    'post_type' => 'alumni',
+    'post_type' => 'people',
     'post_status' => 'publish',
     'posts_per_page' => '10'
   );
-  $alumni_loop = new WP_Query($args);
+  $people_loop = new WP_Query($args);
   $number_of_columns = 3;
   $columns = array_fill(0, $number_of_columns, array());
-  if ($alumni_loop->have_posts()) {
-    $alumni_count = 0;
-    while ($alumni_loop->have_posts()) {
-      $alumni_loop->the_post();
+  if ($people_loop->have_posts()) {
+    $people_count = 0;
+    while ($people_loop->have_posts()) {
+      $people_loop->the_post();
       // Set Variables
       $name = get_the_title();
       $position = get_field('position');
       $thumbnail = wp_get_attachment_image_src(get_post_thumbnail_id(), 'full');
       $profile_image = $thumbnail[0];
       // Output
-      array_push($columns[$alumni_count % $number_of_columns], array(
+      array_push($columns[$people_count % $number_of_columns], array(
         'name' => $name,
         'position' => $position,
         'image' => $profile_image
       ));
-      $alumni_count++;
+      $people_count++;
     }
   }
   ?>
@@ -93,17 +93,17 @@ function alumni_grid_shortcode() {
         ?>
           <div class="col">
             <?php
-            // Build each alumni
-            foreach($columns[$column] as $alumni) {
-              $alumni_name = $alumni['name'];
-              $alumni_position = $alumni['position'];
-              $alumni_image_link = $alumni['image'];
+            // Build each people
+            foreach($columns[$column] as $people) {
+              $people_name = $people['name'];
+              $people_position = $people['position'];
+              $people_image_link = $people['image'];
               ?>
                 <div class="person">
-                  <img src="<?php echo $alumni_image_link; ?>" alt="<?php echo $alumni_name; ?>">
+                  <img src="<?php echo $people_image_link; ?>" alt="<?php echo $people_name; ?>">
                   <div class="info">
-                    <h3><?php echo $alumni_name ?></h3>
-                    <h3 class="subtitle"><?php echo $alumni_position ?></h3>
+                    <h3><?php echo $people_name ?></h3>
+                    <h3 class="subtitle"><?php echo $people_position ?></h3>
                   </div>
                 </div>
               <?php
@@ -123,4 +123,5 @@ function alumni_grid_shortcode() {
   return $output;
 }
 
-add_shortcode('alumni_grid', 'alumni_grid_shortcode');
+wp_enqueue_style('myprefix-style', plugins_url('index.css', __FILE__));
+add_shortcode('people_grid', 'people_grid_shortcode');
